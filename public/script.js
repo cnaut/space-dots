@@ -7,48 +7,61 @@ var context = canvas.getContext("2d");
 var deltaX = 0;
 var deltaY = 0;
 
-function drawShip() {
-  context.clearRect(0, 0, canvas.width, canvas.height);
+var keys = [];
+var thisPlayer = {
+  x: 0,
+  y: 0
+}
 
+var socket = new WebSocket("ws://127.0.0.1:8080/ws");
+
+function clearPlayer(player) {
+  context.clearRect(player.x - 2, player.y -2, 64, 54);
+}
+
+function drawPlayer(player) {
+  console.log(player);
   // Ship
   context.beginPath();
-  context.moveTo(200 + deltaX, 100 + deltaY);
-  context.lineTo(170 + deltaX, 150 + deltaY);
-  context.lineTo(230 + deltaX, 150 + deltaY);
+  context.moveTo(30 + player.x, player.y);
+  context.lineTo(player.x, 50 + player.y);
+  context.lineTo(60 + player.x, 50 + player.y);
   context.closePath();
-
-  socket.send('{ "X": ' + deltaX + ', "Y": ' + deltaY + '}');
   
   context.fill();
 }
  
 function keysPressed(e) {
+  clearPlayer(thisPlayer);
+
   // Store entry for every key pressed
   keys[e.keyCode] = true;
 
   // Left
   if (keys[37]) {
-    deltaX -= 2;
+    thisPlayer.x -= 2;
   }
 
   // Right
   if (keys[39]) {
-    deltaX += 2;
+    thisPlayer.x += 2;
   }
 
   // Down
   if (keys[38]) {
-    deltaY -= 2;
+    thisPlayer.y -= 2;
   }
 
   // Up
   if (keys[40]) {
-    deltaY += 2;
+    thisPlayer.y += 2;
   }
 
   e.preventDefault();
 
-  drawShip();
+  drawPlayer(thisPlayer);
+
+  socket.send('{ "id": ' + thisPlayer.id + ', "x": ' + thisPlayer.x + ', "y": ' + thisPlayer.y + ' }');
 }
  
 function keysReleased(e) {
@@ -59,14 +72,10 @@ function keysReleased(e) {
 window.addEventListener("keydown", keysPressed, false);
 window.addEventListener("keyup", keysReleased, false);
  
-var keys = [];
-
-var socket = new WebSocket("ws://127.0.0.1:8080/ws");
 console.log("Attempting Connection...");
 
 socket.onopen = () => {
   console.log("Successfully Connected");
-  drawShip();
 };
 
 socket.onclose = event => {
@@ -79,5 +88,17 @@ socket.onerror = error => {
 };
 
 socket.onmessage = function (event) {
+  if (!event.data) {
+    return;
+  }
+
   console.log(event.data);
+
+  var player = JSON.parse(event.data);
+  if (player.self) {
+    thisPlayer.id = player.id;
+  } else {
+    clearPlayer(player)
+    drawPlayer(player)
+  }
 };

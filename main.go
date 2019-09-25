@@ -15,12 +15,15 @@ var upgrader = websocket.Upgrader{
 	WriteBufferSize: 1024,
 }
 
+var numPlayers = 0
 var clients = make(map[*websocket.Conn]bool)
 var broadcast = make(chan Player)
 
 type Player struct {
-	X int `json:"x"`
-	Y int `json:"y"`
+	ID   int  `json:"id"`
+	X    int  `json:"x"`
+	Y    int  `json:"y"`
+	Self bool `json:"self"`
 }
 
 func home(w http.ResponseWriter, r *http.Request) {
@@ -64,6 +67,9 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 	}
 
 	log.Println("Client Connected")
+	player := Player{numPlayers, 0, 0, true}
+	err = ws.WriteJSON(player)
+	numPlayers++
 	if err != nil {
 		log.Println(err)
 	}
