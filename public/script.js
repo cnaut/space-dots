@@ -9,8 +9,8 @@ var deltaY = 0;
 
 var keys = [];
 var thisPlayer = {
-  x: 0,
-  y: 0
+  x: Math.floor(Math.random() * 1000),
+  y: Math.floor(Math.random() * 1000)
 }
 
 var socket = new WebSocket("ws://127.0.0.1:8080/ws");
@@ -31,7 +31,7 @@ function drawPlayer(player) {
   context.fill();
 }
  
-function keysPressed(e) {
+function keysPressed(e, sendUpdate) {
   clearPlayer(thisPlayer);
 
   // Store entry for every key pressed
@@ -76,6 +76,7 @@ console.log("Attempting Connection...");
 
 socket.onopen = () => {
   console.log("Successfully Connected");
+  drawPlayer(thisPlayer);
 };
 
 socket.onclose = event => {
