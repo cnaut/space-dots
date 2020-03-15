@@ -71,13 +71,21 @@ socket.onmessage = function (event) {
     if (!event.data) {
         return;
     }
-    console.log(event.data);
-    var player = JSON.parse(event.data);
-    if (player.self) {
-        thisPlayer.id = player.id;
-    }
-    else {
-        clearPlayer(player);
-        drawPlayer(player);
+    var players = JSON.parse(event.data);
+    players = JSON.parse(players);
+    console.log(players);
+    console.log("GOING TO FOR EACH");
+    console.log(players[0]);
+    for (var _i = 0, _a = players.values(); _i < _a.length; _i++) {
+        var player = _a[_i];
+        console.log("THIS PLAYER");
+        console.log(player);
+        if (player.self) {
+            thisPlayer.id = player.id;
+        }
+        else {
+            clearPlayer(player);
+            drawPlayer(player);
+        }
     }
 };

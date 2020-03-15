@@ -1,4 +1,3 @@
-
 const canvas : any = <HTMLCanvasElement> document.querySelector("#playground");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
@@ -95,13 +94,20 @@ socket.onmessage = function (event) {
     return;
   }
 
-  console.log(event.data);
-
-  let player = JSON.parse(event.data);
-  if (player.self) {
-    thisPlayer.id = player.id;
-  } else {
-    clearPlayer(player)
-    drawPlayer(player)
+  let players = JSON.parse(event.data);
+  players = JSON.parse(players)
+  console.log(players)
+  console.log("GOING TO FOR EACH")
+  console.log(players[0])
+  for (let player of players.values()) {
+    console.log("THIS PLAYER")
+    console.log(player)
+    
+    if (player.self) {
+      thisPlayer.id = player.id;
+    } else {
+      clearPlayer(player)
+      drawPlayer(player)
+    }
   }
 };

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"html/template"
 	"log"
@@ -18,6 +19,7 @@ var upgrader = websocket.Upgrader{
 var numPlayers = 0
 var clients = make(map[*websocket.Conn]bool)
 var broadcast = make(chan Player)
+var players = make(map[int]Player)
 
 type Player struct {
 	ID   int  `json:"id"`
@@ -42,8 +44,11 @@ func home(w http.ResponseWriter, r *http.Request) {
 func reader(conn *websocket.Conn) {
 	for {
 		// Read in a message
+		log.Println("MESSAGE")
+		log.Println(conn)
 		var player Player
 		err := conn.ReadJSON(&player)
+		log.Println(err)
 		if err != nil {
 			log.Println(err)
 			delete(clients, conn)
@@ -68,8 +73,15 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("Client Connected")
 	player := Player{numPlayers, 0, 0, true}
-	err = ws.WriteJSON(player)
+	players[numPlayers] = player
 	numPlayers++
+
+	playersJSON, err := json.Marshal(players)
+	if err != nil {
+		log.Println(err)
+	}
+
+	err = ws.WriteJSON(string(playersJSON))
 	if err != nil {
 		log.Println(err)
 	}
@@ -91,6 +103,7 @@ func setupRoutes() {
 func handleActions() {
 	log.Println("Handling Actions")
 	for {
+		log.Println("ACTION")
 		player := <-broadcast
 		log.Println("Looping")
 		for client := range clients {
