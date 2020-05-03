@@ -86,6 +86,8 @@ func wsEndpoint(w http.ResponseWriter, r *http.Request) {
 		log.Println(err)
 	}
 
+	player.Self = false
+
 	clients[ws] = true
 
 	reader(ws)

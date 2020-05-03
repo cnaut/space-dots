@@ -99,7 +99,7 @@ socket.onmessage = function (event) {
   console.log(players)
   console.log("GOING TO FOR EACH")
   console.log(players[0])
-  for (let player of players.values()) {
+  for (let player of players) {
     console.log("THIS PLAYER")
     console.log(player)
     

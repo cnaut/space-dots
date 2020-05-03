@@ -76,8 +76,8 @@ socket.onmessage = function (event) {
     console.log(players);
     console.log("GOING TO FOR EACH");
     console.log(players[0]);
-    for (var _i = 0, _a = players.values(); _i < _a.length; _i++) {
-        var player = _a[_i];
+    for (var _i = 0, players_1 = players; _i < players_1.length; _i++) {
+        var player = players_1[_i];
         console.log("THIS PLAYER");
         console.log(player);
         if (player.self) {
